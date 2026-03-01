@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CHURN.AI - Predictive Churn Analysis
 
-## Getting Started
+CHURN.AI is a predictive churn analysis application with a "crazy as hell" highly dynamic, neon-themed, and interactive 3D 
+UI. It functions as a complete Next.js 15 template using the App Router, incorporating tools like Framer Motion for animations, Better-SQLite3 for database interactions, and Spline for 3D real-time interactions.
 
-First, run the development server:
+## 🚀 Features
 
+- **Interactive 3D UI**: Real-time interactive 3D canvas (Spline) built directly into the homepage, fully responsive to the user's cursor.
+- **Neon / Glassmorphism Aesthetic**: Dark mode, blurred backgrounds, dynamic gradients, and custom scrollbars. 
+- **Full Authentication System**: End-to-end user authentication with SQLite database using `better-sqlite3`, `bcryptjs`, and JSON Web Tokens (`jsonwebtoken`).
+- **Dashboard**: A dedicated operational center filled with mocked predictive churn data elements and dynamic hover effects.
+- **Framer Motion Elements**: Liquid micro-animations accompanying page transitions and elements snapping into view.
+
+---
+
+## 🛠 Prerequisites
+
+Before starting, ensure you have the following installed on your machine:
+- **Node.js**: v18.0.0 or higher
+- **npm**: v8.0.0 or higher
+
+---
+
+## 🏃 How to Run the Project
+
+1. **Clone or Extract the Repository:**
+If you have just unzipped the project, open the extracted directory in your terminal:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd chrunprediction
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Install Dependencies:**
+Run the following command to install all the necessary packages:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Database Initialization:**
+The project uses SQLite as the standard storage. To use it, simply start the app—the initialization logic built into `/src/lib/db.ts` will automatically execute `CREATE TABLE IF NOT EXISTS` commands and generate a `churn.db` file in the root folder upon your first request. 
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. **Start the Development Server:**
+Start the Next.js development server by running:
+```bash
+npm run dev
+```
 
-## Learn More
+5. **Visit the UI:**
+Once the server is running, open your browser and navigate to:
+```
+http://localhost:3000
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🗄 Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* `/src/app/page.tsx`: The main landing page hosting the Spline cursor-reactive 3D scene.
+* `/src/app/globals.css`: Handles core styling and neon properties.
+* `/src/app/dashboard/page.tsx`: Contains the operational metrics structure. 
+* `/src/app/api/auth/*`: Contains `better-sqlite3` integrated authentication endpoints (`/login`, `/register`, `/logout`).
+* `/src/lib/db.ts`: Handles connecting to `churn.db`.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 👨‍💻 Authentication Setup
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Currently, there are no default users. The easiest way to browse the dashboard is to:
+1. Hit **Sign Up** from the Navigation Bar.
+2. Enter a Designation (Name), Email, and Password.
+3. Click **Generate Identity**. 
+4. Hit **Login** with those same credentials.
+5. Watch the dashboard come to life. 
+
+Enjoy exploring the metrics and trying out the interactive Spline scene on the front page!

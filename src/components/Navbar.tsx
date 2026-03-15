@@ -63,6 +63,9 @@ export default function Navbar() {
                             <Link href="/dashboard" className="text-sm text-gray-300 hover:text-white transition-colors">
                                 Dashboard
                             </Link>
+                            <Link href="/predict" className="text-sm px-3 py-1.5 rounded-md font-bold flex items-center gap-1 border border-[var(--color-neon-purple)] text-[var(--color-neon-purple)] hover:bg-[rgba(176,38,255,0.15)] hover:shadow-[0_0_12px_rgba(176,38,255,0.4)] transition-all">
+                                ⚡ PREDICT
+                            </Link>
                             <button onClick={handleLogout} className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition-colors">
                                 <LogOut size={14} /> LOGOUT
                             </button>

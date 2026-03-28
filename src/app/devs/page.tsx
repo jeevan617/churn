@@ -14,7 +14,7 @@ export default function DevsPage() {
     }, []);
     const devs = [
         {
-            name: "Manashree",
+            name: "Manaswini",
             role: "Developer",
             status: "ONLINE",
             contact: "manaswinir964@gmail.com",

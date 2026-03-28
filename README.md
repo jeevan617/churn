@@ -489,6 +489,60 @@ Run a churn prediction for any domain. Requires authentication.
 
 ---
 
+### 🎯 Live Demo Examples (SaaS Model)
+
+When presenting the platform, use these exact parameters in the **SaaS** predictor to mathematically trigger specific tiered risk percentages:
+
+#### Exactly 0% (OPTIMAL Retention Boundary)
+- **Subscription Age**: 35 Months
+- **Plan Tier**: Enterprise
+- **Monthly Active Days**: 0
+- **Features Used Pct**: 97%
+- **Team Size**: 34
+- **Last Login**: 1 Day Ago
+- **Support Tickets**: 0
+- **NPS Score**: 6
+- **Integrations**: True | **SSO**: True | **CSM**: True
+- **API Calls**: 8963
+
+#### Exactly 25% (MODERATE Risk Boundary)
+- **Subscription Age**: 37 Months
+- **Plan Tier**: Enterprise
+- **Monthly Active Days**: 2
+- **Features Used Pct**: 26%
+- **Team Size**: 21
+- **Last Login**: 8 Days Ago
+- **Support Tickets**: 0
+- **NPS Score**: 0
+- **Integrations**: False | **SSO**: True | **CSM**: False
+- **API Calls**: 5929
+
+#### Exactly 50% (HIGH Risk Boundary)
+- **Subscription Age**: 41 Months
+- **Plan Tier**: Pro
+- **Monthly Active Days**: 1
+- **Features Used Pct**: 30%
+- **Team Size**: 16
+- **Last Login**: 33 Days Ago
+- **Support Tickets**: 7
+- **NPS Score**: 1
+- **Integrations**: True | **SSO**: True | **CSM**: True
+- **API Calls**: 4832
+
+#### Exactly 75% (CRITICAL Risk Boundary)
+- **Subscription Age**: 7 Months
+- **Plan Tier**: Basic
+- **Monthly Active Days**: 25
+- **Features Used Pct**: 3%
+- **Team Size**: 24
+- **Last Login**: 45 Days Ago
+- **Support Tickets**: 6
+- **NPS Score**: 7
+- **Integrations**: True | **SSO**: False | **CSM**: False
+- **API Calls**: 2071
+
+---
+
 ## UI & Design System
 
 ### CSS Variables (in `globals.css`)

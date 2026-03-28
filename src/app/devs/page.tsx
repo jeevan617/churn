@@ -2,24 +2,40 @@
 
 import { motion } from 'framer-motion';
 import { Terminal, Github, Linkedin, Mail } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export default function DevsPage() {
+    const [mounted, setMounted] = useState(false);
+    const [timeStr, setTimeStr] = useState('');
+
+    useEffect(() => {
+        setMounted(true);
+        setTimeStr(new Date().toISOString());
+    }, []);
     const devs = [
         {
-            name: "KARTHIK M",
-            role: "Lead Architect & Security",
+            name: "Manashree",
+            role: "Developer",
             status: "ONLINE",
-            contact: "karthik.m@churn.ai",
-            skills: ["System Design", "Cryptography", "Predictive Modeling", "WebGL"],
-            key: "PRIMARY_OPERATOR"
+            contact: "manaswinir964@gmail.com",
+            skills: ["System Design", "Predictive Modeling"],
+            key: "DEV_01"
         },
         {
-            name: "UNKNOWN ENTITY",
-            role: "AI Consultant",
-            status: "CLASSIFIED",
-            contact: "redacted@sys.local",
-            skills: ["Neural Networks", "Anomaly Detection", "Deep Learning Base"],
-            key: "GHOST_IN_THE_SHELL"
+            name: "Keerthi",
+            role: "Developer",
+            status: "ONLINE",
+            contact: "keerthinp01@gmail.com",
+            skills: ["Frontend", "UI/UX"],
+            key: "DEV_02"
+        },
+        {
+            name: "Nidhi",
+            role: "Developer",
+            status: "ONLINE",
+            contact: "nidhivbhat0609@gmail.com",
+            skills: ["Backend", "Database"],
+            key: "DEV_03"
         }
     ];
 
@@ -42,11 +58,11 @@ export default function DevsPage() {
                         Development Team
                     </h1>
                     <p className="text-gray-400 font-mono text-xs tracking-wider">
-                        [ AUTHORIZED ACCESS LOGGED: {new Date().toISOString()} ]
+                        [ AUTHORIZED ACCESS LOGGED: {mounted ? timeStr : 'FETCHING_TIMESTAMP...'} ]
                     </p>
                 </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {devs.map((dev, i) => (
                         <motion.div
                             key={i}

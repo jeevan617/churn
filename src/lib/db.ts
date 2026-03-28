@@ -14,6 +14,25 @@ db.exec(`
     password TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS feedbacks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    employee_name TEXT NOT NULL,
+    message TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS predictions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    domain TEXT,
+    score INTEGER,
+    risk_level TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  INSERT OR IGNORE INTO users (name, email, password)
+  VALUES ('CEO', 'ceo@churn.ai', '$2b$10$wlp63H7MWiR8g1ShdHshWuKYbpjxc8RMLKOhOjFpeLac.vN1V3wpC');
 `);
 
 export default db;

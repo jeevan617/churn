@@ -59,6 +59,15 @@ CHURN.AI is a full-stack **predictive churn analysis system** that uses logistic
 - **Protected routes** — all dashboard & prediction pages redirect unauthenticated users to `/login`
 - **Persistent sessions** — token stored in secure cookie, validated on every API call
 
+### 💬 Direct-to-CEO Feedback
+- **Secure message channel** from employees directly to the CEO
+- **Stored safely** within a dedicated SQLite table
+- **Executive inbox** with chronological views of employee sentiment
+
+### 📊 Real-Time Database Analytics
+- **Live dashboards** syncing predicted churn metrics directly from the SQL pipeline.
+- **Dynamic distribution scale** visually mapping real-time predictions incrementally.
+
 ### 🗄️ Database
 - **SQLite via `better-sqlite3`** — zero-config, file-based, auto-initialized
 - **WAL journal mode** for improved concurrent read performance
@@ -144,9 +153,18 @@ chrunprediction/
 │   │   │   ├── saas/page.tsx         # SaaS predictor (12 params)
 │   │   │   └── gaming/page.tsx       # Gaming predictor (12 params)
 │   │   │
+│   │   ├── feedback/                 # Employee feedback submission form
+│   │   │   └── page.tsx
+│   │   │
+│   │   ├── ceo/
+│   │   │   └── feedback/             # Executive inbox for CEO feedback
+│   │   │       └── page.tsx
+│   │   │
 │   │   └── api/
 │   │       ├── predict/
 │   │       │   └── route.ts          # POST /api/predict — unified ML scoring API
+│   │       ├── feedback/
+│   │       │   └── route.ts          # GET/POST /api/feedback — feedback storage API
 │   │       └── auth/
 │   │           ├── register/route.ts # POST /api/auth/register
 │   │           ├── login/route.ts    # POST /api/auth/login
@@ -218,6 +236,12 @@ Me      →  GET  /api/auth/me        →  Verify JWT             →  Return us
 4. You'll be redirected to `/login` — enter your credentials
 5. Click **AUTHENTICATE** — you're now logged in
 
+### Default CEO Account
+
+A dedicated CEO account is automatically generated upon database initialization to evaluate the executive feedback and dashboard statistics. Use these credentials to test the restricted views:
+- **Email**: `ceo@churn.ai`
+- **Password**: `admin`
+
 ### Protected Routes
 
 All routes below require a valid JWT cookie and redirect to `/login` if unauthenticated:
@@ -277,6 +301,43 @@ Returns the currently authenticated user.
 
 // Response 401
 { "authenticated": false }
+```
+
+---
+
+### `POST /api/feedback`
+
+Submit direct employee feedback to the CEO.
+
+```json
+// Request body
+{
+  "employee_name": "John Doe",
+  "message": "This is my feedback."
+}
+
+// Response 201
+{ "message": "Feedback submitted successfully" }
+```
+
+---
+
+### `GET /api/feedback`
+
+Retrieve all employee feedback (executive inbox).
+
+```json
+// Response 200
+{
+  "feedbacks": [
+    {
+      "id": 1,
+      "employee_name": "John Doe",
+      "message": "This is my feedback.",
+      "created_at": "2026-03-28 12:00:00"
+    }
+  ]
+}
 ```
 
 ---
@@ -477,6 +538,8 @@ Run a churn prediction for any domain. Requires authentication.
 | `/predict/banking` | ✅ Yes | Banking churn predictor |
 | `/predict/saas` | ✅ Yes | SaaS / Subscription churn predictor |
 | `/predict/gaming` | ✅ Yes | Gaming churn predictor |
+| `/feedback` | ✅ Yes | Submit direct feedback to the CEO |
+| `/ceo/feedback` | ✅ CEO | Executive inbox to view employee feedback |
 
 ---
 

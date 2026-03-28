@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 
 export default function Navbar() {
     const pathname = usePathname();
-    const [user, setUser] = useState<{ name: string } | null>(null);
+    const [user, setUser] = useState<{ name: string; email?: string } | null>(null);
 
     useEffect(() => {
         fetch('/api/auth/me')
@@ -63,6 +63,16 @@ export default function Navbar() {
                             <Link href="/dashboard" className="text-sm text-gray-300 hover:text-white transition-colors">
                                 Dashboard
                             </Link>
+                            {user.email !== 'ceo@churn.ai' && (
+                                <Link href="/feedback" className="text-sm text-gray-300 hover:text-white transition-colors">
+                                    Feedback
+                                </Link>
+                            )}
+                            {user.email === 'ceo@churn.ai' && (
+                                <Link href="/ceo/feedback" className="text-sm text-gray-300 hover:text-white transition-colors flex items-center gap-1">
+                                    CEO Inbox
+                                </Link>
+                            )}
                             <Link href="/predict" className="text-sm px-3 py-1.5 rounded-md font-bold flex items-center gap-1 border border-[var(--color-neon-purple)] text-[var(--color-neon-purple)] hover:bg-[rgba(176,38,255,0.15)] hover:shadow-[0_0_12px_rgba(176,38,255,0.4)] transition-all">
                                 ⚡ PREDICT
                             </Link>

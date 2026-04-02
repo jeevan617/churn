@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Brain, ChevronRight, RotateCcw, TrendingUp, TrendingDown, Zap, ShieldCheck, AlertTriangle, Activity } from 'lucide-react';
+import { Brain, ChevronRight, RotateCcw, TrendingUp, TrendingDown, Zap, ShieldCheck, AlertTriangle, Activity, X } from 'lucide-react';
 
 // ── Types ────────────────────────────────────────────────────────
 export type FieldDef =
@@ -64,7 +64,7 @@ function Gauge({ score }: { score: number }) {
 }
 
 // ── Field Renderers ───────────────────────────────────────────────
-function SliderF({ f, value, onChange, primary }: { f: Extract<FieldDef, 'slider' | any>, value: number, onChange: (v: number) => void, primary: string }) {
+function SliderF({ f, value, onChange, primary }: { f: Extract<FieldDef, { type: 'slider' }>, value: number, onChange: (v: number) => void, primary: string }) {
     const pct = ((value - f.min) / (f.max - f.min)) * 100;
     return (
         <div>
@@ -126,12 +126,16 @@ export default function DomainPredictor({ config }: { config: DomainConfig }) {
     const [result, setResult] = useState<PredictionResult | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showDoc, setShowDoc] = useState(false);
 
     const setField = useCallback((key: string, val: unknown) => setForm(p => ({ ...p, [key]: val })), []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); setLoading(true); setError('');
         try {
+            // Artificial delay to show parsing animation
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+            
             const res = await fetch('/api/predict', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ domain: config.domain, ...form }) });
             if (res.status === 401) { router.push('/login'); return; }
             const data = await res.json();
@@ -207,9 +211,33 @@ export default function DomainPredictor({ config }: { config: DomainConfig }) {
 
                     {/* Results */}
                     <div className="lg:col-span-2 space-y-4">
-                        {!result ? (
-                            <div className="glass-panel rounded-2xl p-8 bg-[rgba(8,8,15,0.9)] flex flex-col items-center justify-center min-h-[300px] text-center border-dashed border-[rgba(255,255,255,0.05)]">
-                                <Brain size={44} className="text-gray-700 mb-3" />
+                        {loading ? (
+                            <div className="glass-panel rounded-2xl p-8 bg-[rgba(8,8,15,0.9)] flex flex-col items-center justify-center min-h-[350px] text-center transition-all duration-500" 
+                                style={{ boxShadow: `0 0 40px ${config.primaryColor}15 inset`, border: `1px solid ${config.primaryColor}30` }}>
+                                <div className="relative w-28 h-28 mb-8 flex items-center justify-center">
+                                    <div className="absolute inset-0 rounded-full border-t-2 border-r-2 border-transparent" style={{ borderTopColor: config.primaryColor, borderRightColor: config.secondaryColor, animation: 'spin-slow 1.5s linear infinite' }} />
+                                    <div className="absolute inset-2 rounded-full border-b-2 border-l-2 border-transparent" style={{ borderBottomColor: config.secondaryColor, borderLeftColor: config.primaryColor, animation: 'spin-reverse 2s linear infinite' }} />
+                                    <div className="absolute inset-5 rounded-full border border-dashed border-[rgba(255,255,255,0.1)]" style={{ animation: 'spin-slow 8s linear infinite' }} />
+                                    <Brain size={36} className="text-white" style={{ filter: `drop-shadow(0 0 15px ${config.primaryColor})`, animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} />
+                                </div>
+                                <h3 className="text-white font-bold tracking-widest text-[13px] mb-4 uppercase flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full animate-ping" style={{ background: config.primaryColor }} />
+                                    Processing Profile
+                                </h3>
+                                <div className="flex flex-col gap-1.5 w-full max-w-[240px]">
+                                    <div className="flex justify-between text-[9px] font-mono text-gray-400">
+                                        <span>CROSS-REFERENCING</span>
+                                        <span className="animate-pulse" style={{ color: config.primaryColor }}>CALCULATING...</span>
+                                    </div>
+                                    <div className="h-1 w-full bg-[#1a1a2e] rounded-full overflow-hidden relative">
+                                        <div className="absolute top-0 bottom-0 left-0 bg-white" style={{ width: '50%', background: `linear-gradient(90deg, transparent, ${config.primaryColor})`, boxShadow: '0 0 10px rgba(255,255,255,0.8)', animation: 'progress-slide 2s ease-in-out infinite' }} />
+                                    </div>
+                                    <p className="text-[9px] font-mono text-gray-500 mt-3 opacity-70">Evaluating behavioral signals against historical churn indicators...</p>
+                                </div>
+                            </div>
+                        ) : !result ? (
+                            <div className="glass-panel rounded-2xl p-8 bg-[rgba(8,8,15,0.9)] flex flex-col items-center justify-center min-h-[350px] text-center border-dashed border-[rgba(255,255,255,0.05)] transition-all duration-500">
+                                <Brain size={44} className="text-gray-700/50 mb-3" />
                                 <p className="text-gray-600 font-mono text-xs">Configure parameters<br />and run the model.</p>
                             </div>
                         ) : (
@@ -274,11 +302,116 @@ export default function DomainPredictor({ config }: { config: DomainConfig }) {
                                     <h2 className="text-[10px] font-mono text-gray-500 tracking-widest uppercase mb-2">Recommended Action</h2>
                                     <p className="text-xs text-gray-300 leading-relaxed">{RECO[result.riskLevel]}</p>
                                 </div>
+
+                                {/* Improvement & Documentation Button */}
+                                <button onClick={() => setShowDoc(true)}
+                                    className="w-full mt-2 py-3 px-4 rounded-xl border border-[var(--color-neon-blue)]/50 bg-[var(--color-neon-blue)]/10 text-[var(--color-neon-blue)] hover:bg-[var(--color-neon-blue)]/20 hover:border-[var(--color-neon-blue)] transition-all flex justify-between items-center group shadow-[0_0_15px_rgba(0,240,255,0.1)]">
+                                    <div className="flex items-center gap-2">
+                                        <Zap size={14} className="group-hover:animate-pulse" />
+                                        <span className="text-[11px] font-mono font-bold tracking-widest uppercase">Parameter Action Plan & Setup Details</span>
+                                    </div>
+                                    <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                </button>
                             </>
                         )}
                     </div>
                 </div>
             </div>
+
+            {/* Improvement Modal */}
+            {showDoc && result && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="glass-panel rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col bg-[rgba(10,10,18,0.95)] border border-[rgba(255,255,255,0.1)] shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden">
+                        
+                        {/* Header */}
+                        <div className="p-6 border-b border-[rgba(255,255,255,0.05)] flex justify-between items-center bg-[#050505]">
+                            <div>
+                                <h2 className="text-xl font-bold text-white flex items-center gap-3">
+                                    <Brain style={{ color: config.primaryColor }} />
+                                    Analysis & Parameter Optimization
+                                </h2>
+                                <p className="text-xs text-gray-400 font-mono mt-1">Detailed breakdown of {config.title} constraints and strategies</p>
+                            </div>
+                            <button type="button" onClick={() => setShowDoc(false)} className="text-gray-500 hover:text-white transition-colors bg-[rgba(255,255,255,0.05)] p-2 rounded-full cursor-pointer">
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        {/* Content Body */}
+                        <div className="p-6 overflow-y-auto custom-scrollbar flex-1 space-y-8">
+                            
+                            {/* Strategy Section */}
+                            <div>
+                                <h3 className="text-[11px] font-mono tracking-widest text-white uppercase mb-4 flex items-center gap-2">
+                                    <Activity size={14} style={{ color: config.primaryColor }} /> Recommended Adjustments based on Prediction
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {result.factors.filter(f => f.direction === 'negative').map((f, i) => (
+                                        <div key={i} className="p-4 rounded-xl border border-red-500/20 bg-[rgba(239,68,68,0.05)]">
+                                            <h4 className="text-sm font-bold text-gray-200 mb-2 flex items-center gap-2">
+                                                <TrendingUp size={14} className="text-red-400" /> {f.name} (Risk Factor)
+                                            </h4>
+                                            <p className="text-xs text-gray-400 leading-relaxed mb-3">
+                                                This specific parameter is actively triggering churn indicators in the model. Its current value signals severe friction.
+                                            </p>
+                                            <div className="bg-red-500/10 rounded border border-red-500/20 p-2 text-[11px] font-mono text-red-200">
+                                                <span className="text-red-400 font-bold block mb-1">IMPROVEMENT PROTOCOL:</span>
+                                                Trigger automated re-engagement workflows. Modify the value structure around this metric, offer guided tutorials, or present flexible downgrade options.
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {result.factors.filter(f => f.direction === 'positive').map((f, i) => (
+                                        <div key={`pos-${i}`} className="p-4 rounded-xl border border-green-500/20 bg-[rgba(34,197,94,0.05)]">
+                                            <h4 className="text-sm font-bold text-gray-200 mb-2 flex items-center gap-2">
+                                                <TrendingDown size={14} className="text-green-400" /> {f.name} (Stable Factor)
+                                            </h4>
+                                            <p className="text-xs text-gray-400 leading-relaxed mb-3">
+                                                This component is holding the user within acceptable retention thresholds.
+                                            </p>
+                                            <div className="bg-green-500/10 rounded border border-green-500/20 p-2 text-[11px] font-mono text-green-200">
+                                                <span className="text-green-400 font-bold block mb-1">LEVERAGE PROTOCOL:</span>
+                                                Reinforce value here. Highlight features related to this parameter in standard communications to cement product fit.
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Parameter Dictionary */}
+                            <div>
+                                <h3 className="text-[11px] font-mono tracking-widest text-white uppercase mb-4 flex items-center gap-2">
+                                    <Zap size={14} style={{ color: config.primaryColor }} /> Core Parameters Dictionary
+                                </h3>
+                                <div className="space-y-4">
+                                    {config.sections.map((sec, si) => (
+                                        <div key={si} className="border border-[rgba(255,255,255,0.05)] rounded-xl overflow-hidden bg-[#0A0A0F]">
+                                            <div className="bg-[rgba(255,255,255,0.02)] px-4 py-3 border-b border-[rgba(255,255,255,0.02)] text-[11px] font-mono tracking-wider text-gray-300 flex items-center gap-2">
+                                                {sec.icon} {sec.title}
+                                            </div>
+                                            <div className="divide-y divide-[rgba(255,255,255,0.02)]">
+                                                {sec.fields.map(f => (
+                                                    <div key={f.key} className="p-4 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 items-start hover:bg-[rgba(255,255,255,0.02)] transition-colors">
+                                                        <div className="text-[11px] font-mono text-[var(--color-neon-blue)] font-bold">{(f as any).label || f.key.toUpperCase()}</div>
+                                                        <div className="md:col-span-2 text-xs text-gray-400 leading-relaxed">
+                                                            <span className="text-gray-300 block mb-1">Description:</span> Evaluates real-time signals associated with the user's {((f as any).label || f.key).toLowerCase()}. Variations in this metric carry substantial weight in predicting lifetime value shifts within the {config.domain} sector. Optimizing this generally lifts retention.
+                                                            <div className="mt-2 text-[10px] text-gray-500 flex items-center gap-2 flex-wrap">
+                                                                <span className="px-2 py-0.5 rounded-full border border-gray-700 bg-gray-800/50">Type: {f.type}</span>
+                                                                <span className="px-2 py-0.5 rounded-full border border-gray-700 bg-gray-800/50">Default: {f.default?.toString()}</span>
+                                                                {f.type === 'slider' && <span className="px-2 py-0.5 rounded-full border border-gray-700 bg-gray-800/50">Range: {(f as any).min} to {(f as any).max}</span>}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

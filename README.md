@@ -26,7 +26,8 @@
 8. [API Reference](#api-reference)
 9. [UI & Design System](#ui--design-system)
 10. [Pages Reference](#pages-reference)
-11. [Troubleshooting](#troubleshooting)
+11. [SQLite Commands](#sqlite-commands)
+12. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -594,6 +595,90 @@ When presenting the platform, use these exact parameters in the **SaaS** predict
 | `/predict/gaming` | ✅ Yes | Gaming churn predictor |
 | `/feedback` | ✅ Yes | Submit direct feedback to the CEO |
 | `/ceo/feedback` | ✅ CEO | Executive inbox to view employee feedback |
+
+---
+
+## SQLite Commands
+
+If you need to interact with the database manually, you can use the `sqlite3` CLI. Ensure you have SQLite installed on your system.
+
+```bash
+# Open the SQLite CLI
+sqlite3 churn.db
+```
+
+Inside the SQLite prompt, you can run the following helpful commands:
+
+```sql
+-- Turn on column headers and formatted output for better readability
+.headers on
+.mode column
+
+-- View all tables
+.tables
+
+-- View table schemas
+.schema
+
+-- View all registered users
+SELECT id, name, email, created_at FROM users;
+
+-- View all executive feedback
+SELECT * FROM feedbacks;
+
+-- View all stored churn predictions
+SELECT * FROM predictions;
+
+-- Exit the SQLite CLI
+.quit
+```
+
+### Programmatic Checking
+
+If you prefer to check the database programmatically via Node.js, we have included a script called `check_db.js`.
+
+You can run it to view the total records inside each table:
+
+```bash
+node check_db.js
+```
+
+**`check_db.js` source code:**
+```javascript
+const Database = require('better-sqlite3');
+const path = require('path');
+
+const dbPath = path.resolve(__dirname, 'churn.db');
+
+try {
+  const db = new Database(dbPath, { readonly: true });
+  console.log('✅ Successfully connected to the database.\n');
+
+  const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
+  
+  if (tables.some(t => t.name === 'users')) {
+      console.log('--- 👤 Users ---');
+      const users = db.prepare('SELECT id, name, email, created_at FROM users').all();
+      console.table(users);
+  }
+  
+  if (tables.some(t => t.name === 'feedbacks')) {
+      console.log('\n--- 💬 Feedbacks ---');
+      const feedbacks = db.prepare('SELECT * FROM feedbacks').all();
+      console.table(feedbacks);
+  }
+
+  if (tables.some(t => t.name === 'predictions')) {
+      console.log('\n--- 📊 Predictions ---');
+      const predictions = db.prepare('SELECT * FROM predictions').all();
+      console.log(predictions);
+  }
+
+  db.close();
+} catch (err) {
+  console.error('❌ Error connecting to the database:', err.message);
+}
+```
 
 ---
 
